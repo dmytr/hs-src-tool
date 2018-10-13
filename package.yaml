@@ -1,0 +1,23 @@
+name:                hs-src-tool
+version:             0.1.0.0
+
+default-extensions:
+  - NoImplicitPrelude
+  - OverloadedStrings
+  - ScopedTypeVariables
+
+dependencies:
+  - base >= 4.7 && < 5
+  - directory
+  - filepath
+  - microlens-aeson
+  - text
+  - typed-process
+  - universum
+  - unordered-containers
+  - yaml
+
+executables:
+  hs-src-tool:
+    source-dirs:      src
+    main:             Main.hs
