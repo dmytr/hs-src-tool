@@ -4,12 +4,12 @@ This tool downloads sources of Stack project's dependencies to a `.hs-src-tool` 
 
 ### How to use it
 
-1. Make sure that `stack`, `cabal`, `haskell-code-index`, `haskell-code-serve`, and of course `hs-src-tool` are on your `$PATH`
+1. Make sure that `stack`, `cabal`, `haskell-code-indexer`, `haskell-code-server`, and of course `hs-src-tool` are on your `$PATH`
 1. The tool is designed to be run from the root of Stack project:
    ```shell
    $ cd $PROJECT_ROOT
    ```
-1. Make sure that your project **uses the same version of GHC** as `haskell-code-index` and `haskell-code-serve`!
+1. Make sure that your project **uses the same version of GHC** as `haskell-code-indexer` and `haskell-code-server`!
 1. Build your project first:
    ```shell
    $ stack build
