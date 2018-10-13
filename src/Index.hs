@@ -19,6 +19,7 @@ index workdir resolver = do
       (catchAny (buildStackPackage p >> indexStackPackage p) (reportError p))
       (catchAny (buildCabalPackage p >> indexCabalPackage p) (reportError p))
  where
+
   reportError :: String -> SomeException -> IO ()
   reportError package _ =
     putStrLn $ "Failed to build or index package " <> package
