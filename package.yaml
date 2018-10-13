@@ -14,6 +14,7 @@ dependencies:
   - text
   - typed-process
   - universum
+  - unix
   - unordered-containers
   - yaml
 

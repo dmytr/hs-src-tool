@@ -23,4 +23,8 @@ cabal.project.local~
 
 .stack-work
 *.cabal
+
 .hs-src-tool
+.haskell-code-explorer
+
+.vscode

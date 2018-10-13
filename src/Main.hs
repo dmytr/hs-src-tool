@@ -13,65 +13,33 @@ import           System.FilePath
 import           System.Process.Typed
 import           Universum
 
+import           Fetch
+import           Index
+import           Explore
+
+
 main :: IO ()
 main = do
+  args     <- getArgs
   resolver <- getResolver
-  packages <- getSnapshotPackages resolver
-  deps     <- getProjectDependencies
 
-  let dest = ".hs-src-tool"
+  let workdir = ".hs-src-tool"
 
-  cleanup dest -- not efficient, but works for now
-  downloadPackages dest $ intersect packages deps
-  symlinkExtraPackages dest
+  when ("fetch" `elem` args) $ fetch workdir resolver
+  when ("index" `elem` args) $ index workdir resolver
+  when ("explore" `elem` args) $ do
+    port <- findFlag "port" "port" args
+    ui   <- findFlag "ui" "path to ui dir" args
+    explore workdir port ui
 
+findFlag :: String -> String -> [String] -> IO String
+findFlag flag descr args =
+  maybe (fail $ "Flag --" <> flag <> "=<" <> descr <> "> is required") pure
+    $   drop (length flag + 3)
+    <$> find (isPrefixOf $ "--" <> flag <> "=") args
 
-getResolver :: IO Text
+getResolver :: IO String
 getResolver = do
   cfg :: Value <- decodeFileEither "stack.yaml" >>= either (fail . show) pure
   let resolver = cfg ^? key "resolver" . _String
-  maybe (fail "Couldn't read resolver from stack.yaml") pure resolver
-
-getSnapshotPackages :: Text -> IO [Text]
-getSnapshotPackages resolver = do
-  homePath <- getHomeDirectory
-  let indexPath =
-        homePath </> ".stack" </> "build-plan" </> unpack resolver <.> "yaml"
-
-  index :: Value <- decodeFileEither indexPath >>= either (fail . show) pure
-  let packages = M.keys <$> index ^? key "packages" . _Object
-
-  maybe (fail $ "Couldn't read packages from " <> indexPath) pure packages
-
-getProjectDependencies :: IO [Text]
-getProjectDependencies = do
-  out <- readProcessStdout_ (proc "stack" ["ls", "dependencies"])
-  return . fmap stripVersion . lines $ decodeUtf8 out
- where
-  stripVersion :: Text -> Text
-  stripVersion package = pack . takeWhile (/= ' ') $ unpack package
-
-cleanup :: Text -> IO ()
-cleanup dest = ifM (doesDirectoryExist $ unpack dest)
-                   (removePathForcibly $ unpack dest)
-                   (pure ())
-
-downloadPackages :: Text -> [Text] -> IO ()
-downloadPackages dest packages =
-  runProcess_
-    $  proc "stack"
-    $  ["unpack"]
-    <> fmap unpack packages
-    <> ["--to", unpack dest]
-
-symlinkExtraPackages :: Text -> IO ()
-symlinkExtraPackages dest = do
-  let downloadedPath = ".stack-work" </> "downloaded"
-  ifM (doesDirectoryExist downloadedPath) (symlink downloadedPath) (pure ())
- where
-  symlink :: FilePath -> IO ()
-  symlink path = do
-    packages <- listDirectory path
-    traverse_
-      (\p -> createDirectoryLink (".." </> path </> p) (unpack dest </> p))
-      packages
+  maybe (fail "Couldn't read resolver from stack.yaml") (pure . unpack) resolver
