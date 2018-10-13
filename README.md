@@ -25,7 +25,7 @@ This tool downloads sources of Stack project's dependencies to a `.hs-src-tool` 
    ```
 1. Start the sources explorer
    ```shell
-   $ hs-src-tool explore --port=8080 --ui=$PATH_TO_HASKELL_CODE_EXPLORER_REPO/javascript/public/assets
+   $ hs-src-tool explore --port=8080 --ui=$PATH_TO_HASKELL_CODE_EXPLORER_REPO/javascript/release
    ```
 1. Open http://localhost:8080 and enjoy!
 
